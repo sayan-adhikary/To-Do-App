@@ -1,0 +1,18 @@
+h1{
+    text-align: center;
+}
+
+#input-text {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+button{
+    cursor: pointer;
+}
+
+#task-list{
+    margin-top: 2rem;
+    background-color: aqua;
+}
