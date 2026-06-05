@@ -104,6 +104,7 @@ function loadData() {
     }
 }
 
+//call the function
 loadData();
 
 //creating the Div and adding task 
