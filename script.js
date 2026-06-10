@@ -2,6 +2,7 @@
 let input = document.querySelector('input');
 let addBtn = document.querySelector('#btn');
 let taskList = document.querySelector('#task-list');
+let clearBtn = document.querySelector('#clear-completed');
 
 //creating dataStructure
 let tasks = [];
@@ -27,11 +28,12 @@ addBtn.addEventListener('click', () => {
         return;
     }
     let taskObj = {
-        id: Date.now(),
+        id: Date.now(), //Can I use => crypto.randomUUID();
         text: task,
         completed: false
     }
     tasks.push(taskObj);
+    updateTaskCount();  //to count the tasks
     input.value = "";
     saveTasks();
 
@@ -41,7 +43,7 @@ addBtn.addEventListener('click', () => {
 //Adding a single eventListiner to the taskList [Event Delegation]
 taskList.addEventListener('click', (e) => {
 
-    //Delete functionality
+    //Delete Functionality
     if (e.target.classList.contains('delete-btn')) {
         // console.log("Delete btn pressed");
 
@@ -53,6 +55,7 @@ taskList.addEventListener('click', (e) => {
 
         //remove from the array
         tasks = tasks.filter(task => task.id !== id);
+        updateTaskCount();  //task counter
         saveTasks();    //save to localStorage
     }
 
@@ -81,15 +84,44 @@ taskList.addEventListener('click', (e) => {
                 }
             }
         }
+        //after check the box we will calculate
+        updateTaskCount();
+    }
+
+    //Edit Functionality
+    if (e.target.classList.contains('edit-btn')) {
+        // console.log("Edit Clicked");
+        /*
+        1. User clicks Edit.(done)
+        2. Task text moves into the input box.
+        3. Original task is removed from the array.
+        4. User modifies the text.
+        5. User clicks Add.
+        6. A new updated task is created.
+         */
+
+        let taskDiv = e.target.parentElement;
+        let id = Number(taskDiv.dataset.id);
+        let text = taskDiv.querySelector('span').textContent;
+        //2
+        input.value = text;
+        //3
+        taskDiv.remove();
+        //4, 5 working automatically with add event
+        //filtering the array
+        tasks = tasks.filter(task => task.id !== id);
+        updateTaskCount();  //Task counter
+        //save into the array
+        saveTasks();
     }
 })
 
-//create a function to store the data in localStorage and call everywhere
+//create a function to store the data in localStorage and to call everywhere
 function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-//Creating a loadTask function which will load the task from local Sarver
+//Creating a loadTask function which will load the task from localStorage at the starting
 function loadData() {
     let savedTasks = localStorage.getItem("tasks");
 
@@ -104,8 +136,10 @@ function loadData() {
     }
 }
 
-//call the function
+//call the function [If we will not click anything the loadData function will call first]
 loadData();
+//load the task count after knowing and creating inside the the local Storage
+updateTaskCount();
 
 //creating the Div and adding task 
 function createTask(taskObj) {
@@ -123,6 +157,7 @@ function createTask(taskObj) {
     if (taskObj.completed) span.style.textDecoration = 'line-through';
     //4. edit btn
     let editBtn = document.createElement('button');
+    editBtn.classList.add("edit-btn");
     editBtn.textContent = 'Edit';
     //5.delete btn
     let deleteBtn = document.createElement('button');
@@ -140,3 +175,20 @@ function createTask(taskObj) {
 
     return taskDiv;
 }
+
+//Counter Function (Done)
+function updateTaskCount() {
+    let count = document.querySelector("#task-count");
+    let completed = tasks.filter(tasks => tasks.completed).length;
+    let pending = tasks.length - completed;
+    count.textContent = `Total Tasks: ${tasks.length} || Completed Tasks : ${completed} || Pending : ${pending}`;
+}
+
+//Clear Completed Tasks If I want
+clearBtn.addEventListener('click', ()=>{
+    console.log("clearBtn");
+    tasks = tasks.filter(tasks => !tasks.completed);
+    saveTasks();
+    // taskList.remove();
+    loadData();
+})
