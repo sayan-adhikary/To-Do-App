@@ -1,4 +1,4 @@
-h1{
+h1 {
     text-align: center;
 }
 
@@ -8,11 +8,16 @@ h1{
     gap: 2rem;
 }
 
-button{
+button {
     cursor: pointer;
 }
 
-#task-list{
+#task-list {
     margin-top: 2rem;
     background-color: aqua;
+}
+
+* {
+    background-color: black;
+    color: aqua;
 }

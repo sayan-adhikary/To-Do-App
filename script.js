@@ -7,6 +7,9 @@ let clearBtn = document.querySelector('#clear-completed');
 //creating dataStructure
 let tasks = [];
 
+//create a archive datastructure
+let archivedTasks = [];
+
 // tasks = [
 //     "sayan",
 //     "aiv",
@@ -38,6 +41,7 @@ addBtn.addEventListener('click', () => {
     saveTasks();
 
     createTask(taskObj);
+    renderTasks();  //re arrenge and display
 })
 
 //Adding a single eventListiner to the taskList [Event Delegation]
@@ -57,6 +61,7 @@ taskList.addEventListener('click', (e) => {
         tasks = tasks.filter(task => task.id !== id);
         updateTaskCount();  //task counter
         saveTasks();    //save to localStorage
+        renderTasks();  //reArrenge the tasks
     }
 
     //CheckBox Functionality
@@ -86,6 +91,7 @@ taskList.addEventListener('click', (e) => {
         }
         //after check the box we will calculate
         updateTaskCount();
+        renderTasks();  //reArrange the tasks
     }
 
     //Edit Functionality
@@ -113,27 +119,38 @@ taskList.addEventListener('click', (e) => {
         updateTaskCount();  //Task counter
         //save into the array
         saveTasks();
+        renderTasks();  //reArrange the tasks
     }
 })
 
 //create a function to store the data in localStorage and to call everywhere
 function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
+    localStorage.setItem("archivedTasks", JSON.stringify(archivedTasks));
 }
 
 //Creating a loadTask function which will load the task from localStorage at the starting
 function loadData() {
     let savedTasks = localStorage.getItem("tasks");
+    let savedArchiveTasks = localStorage.getItem("archivedTasks");
 
-    //Convert JSON Back to Array
+    //Convert JSON Back to Array - tasks
     if (savedTasks) {
         tasks = JSON.parse(savedTasks);
     }
+
+    //Convert JSON Back to Array - archivedTasks
+    if (savedArchiveTasks) {
+        archivedTasks = JSON.parse(savedArchiveTasks);
+    }
+
 
     for (let task of tasks) {
         let taskDiv = createTask(task);
         // taskList.appendChild(taskDiv);
     }
+
+    renderTasks();  //reArrange the tasks
 }
 
 //call the function [If we will not click anything the loadData function will call first]
@@ -185,10 +202,22 @@ function updateTaskCount() {
 }
 
 //Clear Completed Tasks If I want
-clearBtn.addEventListener('click', ()=>{
-    console.log("clearBtn");
+clearBtn.addEventListener('click', () => {
+    // console.log("clearBtn");
+    let completedTasks = tasks.filter(tasks => tasks.completed);
+    archivedTasks.push(...completedTasks);
     tasks = tasks.filter(tasks => !tasks.completed);
+    // updateTaskCount();
     saveTasks();
-    // taskList.remove();
-    loadData();
+    renderTasks();
 })
+
+// creating a function which will create display the complete tasks
+function renderTasks() {
+    taskList.innerHTML = "";
+
+    for (let task of tasks) {
+        taskList.appendChild(createTask(task));
+    }
+    updateTaskCount();
+}
